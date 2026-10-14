@@ -12,7 +12,6 @@ import {
   MonitorSmartphone,
   Receipt,
   Settings,
-  ShieldCheck,
   Users,
   UserSquare2,
   FileText,
@@ -83,7 +82,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     <nav className="flex flex-col gap-6 px-3 py-5">
       {groups.map((group) => (
         <div key={group.label}>
-          <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+          <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             {group.label}
           </p>
           <div className="space-y-0.5">
@@ -98,8 +97,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     active
-                      ? "bg-accent/15 text-accent"
-                      : "text-ink-muted hover:bg-white/5 hover:text-ink-foreground",
+                      ? "bg-sidebar-accent font-semibold text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   )}
                 >
                   <item.icon className="h-4 w-4" />
@@ -115,23 +114,19 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-surface">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col overflow-y-auto bg-ink-gradient text-ink-foreground lg:flex">
-        <Link to="/" className="flex items-center gap-2 px-6 py-5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/20 text-accent">
-            <ShieldCheck className="h-4 w-4" />
-          </span>
-          <span className="font-display text-base font-semibold">
-            Scholar<span className="text-accent">Desk</span>
-          </span>
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
+        <Link to="/" aria-label="ScholarDesk admin home" className="flex items-center px-6 py-5">
+          <img src="/brand/wordmark-full-01.png" alt="ScholarDesk" className="h-8 w-auto max-w-full object-contain dark:brightness-0 dark:invert" />
+          <span className="sr-only">Admin portal</span>
         </Link>
         {nav}
       </aside>
 
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-64 overflow-y-auto bg-ink-gradient text-ink-foreground">
-            <div className="px-6 py-5 font-display text-base font-semibold">ScholarDesk Admin</div>
+          <div className="absolute inset-0 bg-foreground/50" onClick={() => setOpen(false)} />
+          <aside className="absolute inset-y-0 left-0 w-64 overflow-y-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+            <Link to="/" onClick={() => setOpen(false)} aria-label="ScholarDesk admin home" className="flex items-center px-6 py-5"><img src="/brand/wordmark-full-01.png" alt="ScholarDesk" className="h-8 w-auto max-w-full object-contain dark:brightness-0 dark:invert" /><span className="sr-only">Admin portal</span></Link>
             {nav}
           </aside>
         </div>

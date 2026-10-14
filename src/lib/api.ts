@@ -1,6 +1,5 @@
 import axios from "axios";
 
-import { PORTALS } from "@/config/portals";
 import { clearAuth } from "@/services/authService";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://api.scholardesk.pro/api/v1";
@@ -39,20 +38,16 @@ api.interceptors.request.use(
 /* ----------------------------------------
  * Response interceptor
  * --------------------------------------*/
-let isRedirecting = false;
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
-
-    if ((status === 401 || status === 403) && !isRedirecting) {
-      isRedirecting = true;
+    if (status === 401) {
       clearAuth();
-      if (typeof window !== "undefined") {
-        window.location.replace(PORTALS.AUTH);
-      }
+      if (typeof window !== "undefined") window.dispatchEvent(new Event("scholardesk:auth-required"));
+    } else if (status === 403 && typeof window !== "undefined") {
+      window.dispatchEvent(new Event("scholardesk:access-denied"));
     }
-
     return Promise.reject(error);
   },
 );

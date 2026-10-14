@@ -72,6 +72,7 @@ import {
   archiveExamMaterial,
   bulkUpdateExamMaterials,
   bulkDeleteExamMaterials,
+  uploadExamMaterialFile,
 } from "@/services/examMaterialService";
 
 const STATUSES: ExamMaterialStatus[] = [
@@ -1323,6 +1324,35 @@ function MaterialsPage() {
                     {editing.file_name ??
                       "No file attached"}
                   </p>
+
+                  <Input
+                    type="file"
+                    aria-label="Upload material file"
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.epub"
+                    className="mt-2"
+                    disabled={saving}
+                    onChange={async event => {
+                      const file = event.target.files?.[0];
+                      event.target.value = "";
+                      if (!file || !editing) return;
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      try {
+                        setSaving(true);
+                        const res = await uploadExamMaterialFile(editing.id, formData);
+                        const updated = (res?.material ?? res?.data?.material) as ExamMaterial | undefined;
+                        if (updated) {
+                          setEditing(updated);
+                          setRows(prev => prev.map(row => (row.id === updated.id ? updated : row)));
+                        }
+                        toast.success("File uploaded.");
+                      } catch {
+                        toast.error("Upload failed. Check the file type and size.");
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                  />
 
                   {editing.page_count !=
                     null && (
