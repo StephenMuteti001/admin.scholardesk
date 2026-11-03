@@ -3,7 +3,7 @@
  * Override per-environment with Vite env vars.
  */
 export const PORTALS = {
-  AUTH: import.meta.env.VITE_AUTH_PORTAL_URL || "https://scholardesk.pro",
+  AUTH: import.meta.env.VITE_AUTH_PORTAL_URL || "https://auth.scholardesk.pro",
   ADMIN: import.meta.env.VITE_ADMIN_PORTAL_URL || "/admin",
   SITE: import.meta.env.VITE_SITE_URL || "/",
   STEALTH: import.meta.env.VITE_STEALTH_URL || "/exam-stealth",

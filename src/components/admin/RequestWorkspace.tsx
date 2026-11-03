@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { apiErrorMessage } from "@/lib/api-error";
 import {
   CalendarClock,
   Download,
@@ -77,9 +78,12 @@ export function RequestWorkspace({ request, onClose, onChange, onDelete }: Props
   const r = request;
 
   const patch = (p: Partial<ServiceRequest>, message: string) => {
-    onChange(r.id, { ...p, updatedAt: new Date().toISOString() });
-    void updateRequest(r.id, p as Record<string, unknown>).catch(() => {});
-    toast.success(message);
+    updateRequest(r.id, p as Record<string, unknown>)
+      .then(() => {
+        onChange(r.id, { ...p, updatedAt: new Date().toISOString() });
+        toast.success(message);
+      })
+      .catch((err) => toast.error("Couldn't save changes", { description: apiErrorMessage(err) }));
   };
 
   const submitReply = () => {
@@ -87,7 +91,7 @@ export function RequestWorkspace({ request, onClose, onChange, onDelete }: Props
     const form = new FormData();
     form.append("body", reply);
     form.append("internal", String(internal));
-    void replyToRequest(r.id, form).catch(() => {});
+    void replyToRequest(r.id, form).catch((err) => toast.error("Reply not sent", { description: apiErrorMessage(err) }));
     onChange(r.id, {
       messages: [
         ...r.messages,
@@ -444,8 +448,12 @@ export function RequestWorkspace({ request, onClose, onChange, onDelete }: Props
               variant="outline"
               className="text-destructive"
               onClick={() => {
-                void refundRequest(r.id, { reason: "admin-initiated" }).catch(() => {});
-                patch({ status: "refunded" }, "Refund issued");
+                refundRequest(r.id, { reason: "administrative" })
+                  .then(() => {
+                    onChange(r.id, { status: "refunded", updatedAt: new Date().toISOString() });
+                    toast.success("Refund recorded");
+                  })
+                  .catch((err) => toast.error("Refund failed", { description: apiErrorMessage(err) }));
               }}
             >
               Refund
@@ -467,10 +475,13 @@ export function RequestWorkspace({ request, onClose, onChange, onDelete }: Props
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={() => {
-                      void deleteRequest(r.id).catch(() => {});
-                      onDelete(r.id);
-                      onClose();
-                      toast.success(`${r.ref} deleted`);
+                      deleteRequest(r.id)
+                        .then(() => {
+                          onDelete(r.id);
+                          onClose();
+                          toast.success(`${r.ref} deleted`);
+                        })
+                        .catch((err) => toast.error("Couldn't delete request", { description: apiErrorMessage(err) }));
                     }}
                   >
                     Delete request

@@ -4,6 +4,7 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
+import { apiErrorMessage } from "@/lib/api-error";
 import { MoreHorizontal } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminPageHeader, StatCard, StatusBadge, formatDate, formatMoney } from "@/components/admin/AdminUI";
@@ -103,9 +104,12 @@ function PaymentsPage() {
 
   const filtered = rows.filter((r) => status === ALL || r.status === status);
   const patch = (id: string, p: Partial<Payment>, message: string) => {
-    void updatePayment(id, p as never).catch(() => {});
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...p } : r)));
-    if (message) toast.success(message);
+    updatePayment(id, p as never)
+      .then(() => {
+        setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...p } : r)));
+        if (message) toast.success(message);
+      })
+      .catch((err) => toast.error("Couldn't update payout", { description: apiErrorMessage(err) }));
   };
 
   const loadStatistics = async () => {

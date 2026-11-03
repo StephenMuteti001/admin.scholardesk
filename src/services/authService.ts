@@ -10,7 +10,7 @@ export type AdminUser = {
   avatarUrl?: string;
 };
 
-const AUTH_STORAGE_KEY = "scholaredge.admin.session";
+const AUTH_STORAGE_KEY = "scholardesk.admin.session";
 
 export function getStoredAuth(): AdminUser | null {
   if (typeof window === "undefined") return null;
